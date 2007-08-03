@@ -1,12 +1,11 @@
 /*----------------------------------------------------------------------
-$Id: RawInputSource.cc,v 1.7 2007/07/18 20:12:06 wmtan Exp $
+$Id: RawInputSource.cc,v 1.13 2007/07/31 23:58:56 wmtan Exp $
 ----------------------------------------------------------------------*/
 
 #include "FWCore/Sources/interface/RawInputSource.h"
 #include "FWCore/Framework/interface/EventPrincipal.h"
 #include "FWCore/Framework/interface/LuminosityBlockPrincipal.h"
 #include "FWCore/Framework/interface/RunPrincipal.h"
-#include "FWCore/Framework/interface/EventPrincipal.h"
 #include "FWCore/Framework/interface/Event.h"
 
 namespace edm {
@@ -18,8 +17,9 @@ namespace edm {
     newRun_(true),
     newLumi_(true),
     ep_(),
-    lbp_()
-  { }
+    lbp_() {
+      setTimestamp(Timestamp::beginOfTime());
+  }
 
   RawInputSource::~RawInputSource() {
   }
@@ -48,7 +48,11 @@ namespace edm {
     } else {
       newRun_ = false;
       return boost::shared_ptr<RunPrincipal>(
-	new RunPrincipal(runNumber_, productRegistry(), processConfiguration()));
+	new RunPrincipal(runNumber_,
+			 timestamp(),
+			 Timestamp::invalidTimestamp(),
+			 productRegistry(),
+			 processConfiguration()));
     }
   }
 
@@ -59,13 +63,18 @@ namespace edm {
     } else {
       newLumi_ = false;
       lbp_ = boost::shared_ptr<LuminosityBlockPrincipal>(
-	new LuminosityBlockPrincipal(luminosityBlockNumber_, productRegistry(), rp, processConfiguration()));
+	new LuminosityBlockPrincipal(luminosityBlockNumber_,
+				     timestamp(),
+				     Timestamp::invalidTimestamp(),
+				     productRegistry(),
+				     rp,
+				     processConfiguration()));
     }
     return lbp_;
   }
 
   std::auto_ptr<EventPrincipal>
-  RawInputSource::readEvent_(boost::shared_ptr<LuminosityBlockPrincipal>) {
+  RawInputSource::readEvent_(boost::shared_ptr<LuminosityBlockPrincipal> lbp) {
     if (remainingEvents_ == 0 || newRun_ || newLumi_) {
       return std::auto_ptr<EventPrincipal>(0); 
     }
@@ -82,7 +91,7 @@ namespace edm {
   RawInputSource::makeEvent(EventID & eventId, Timestamp const& tstamp) {
     eventId = EventID(runNumber_, eventId.event());
     ep_ = std::auto_ptr<EventPrincipal>(
-	new EventPrincipal(eventId, Timestamp(tstamp),
+	new EventPrincipal(eventId, tstamp,
 	productRegistry(), lbp_, processConfiguration(), true));
     std::auto_ptr<Event> e(new Event(*ep_, moduleDescription()));
     return e;
