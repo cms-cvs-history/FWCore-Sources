@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------
-$Id: RawInputSource.cc,v 1.23 2008/10/08 22:10:20 wmtan Exp $
+$Id: RawInputSource.cc,v 1.21 2008/07/03 04:07:10 wmtan Exp $
 ----------------------------------------------------------------------*/
 
 #include "FWCore/Sources/interface/RawInputSource.h"
@@ -55,7 +55,6 @@ namespace edm {
 
   std::auto_ptr<Event>
   RawInputSource::makeEvent(RunNumber_t run, LuminosityBlockNumber_t lumi, EventNumber_t event, Timestamp const& tstamp) {
-    EventSourceSentry sentry(*this);
     EventAuxiliary eventAux(EventID(run, event),
       processGUID(), tstamp, lumi, true, EventAuxiliary::Data);
     ep_ = std::auto_ptr<EventPrincipal>(
@@ -103,7 +102,7 @@ namespace edm {
 
   std::auto_ptr<EventPrincipal>
   RawInputSource::readIt(EventID const&) {
-      throw edm::Exception(errors::LogicError,"RawInputSource::readEvent_(EventID const& eventID)")
+      throw cms::Exception("LogicError","RawInputSource::readEvent_(EventID const& eventID)")
         << "Random access read cannot be used for RawInputSource.\n"
         << "Contact a Framework developer.\n";
   }
@@ -111,7 +110,7 @@ namespace edm {
   // Not yet implemented
   void
   RawInputSource::skip(int) {
-      throw edm::Exception(errors::LogicError,"RawInputSource::skip(int offset)")
+      throw cms::Exception("LogicError","RawInputSource::skip(int offset)")
         << "Random access skip cannot be used for RawInputSource\n"
         << "Contact a Framework developer.\n";
   }
