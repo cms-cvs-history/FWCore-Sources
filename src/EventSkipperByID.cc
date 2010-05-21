@@ -106,8 +106,8 @@ namespace edm {
   }
 
   bool
-  EventSkipperByID::operator()(FileIndex::Element& e) const {
-    return skipIt(e.run_, e.lumi_, e.event_);
+  EventSkipperByID::operator()(IndexIntoFile::Element& e) const {
+    return skipIt(e.run(), e.lumi(), e.event());
   }
 
   void
