@@ -15,11 +15,11 @@ namespace edm {
   // calls can and should be deleted from the code.
   EDInputSource::EDInputSource(ParameterSet const& pset, InputSourceDescription const& desc) :
       InputSource(pset, desc),
-      poolCatalog_(),
-      catalog_(pset, poolCatalog_),
-      secondaryCatalog_(pset, poolCatalog_,
-        std::string("secondaryFileNames"),
-        !pset.getUntrackedParameter<bool>("needSecondaryFileNames", false)) {}
+      catalog_(pset.getUntrackedParameter<std::vector<std::string> >("fileNames")) ,
+      secondaryCatalog_(pset.getUntrackedParameter<bool>("needSecondaryFileNames", false) ?
+	pset.getUntrackedParameter<std::vector<std::string> >("secondaryFileNames") : 
+	pset.getUntrackedParameter<std::vector<std::string> >("secondaryFileNames", std::vector<std::string>()))
+  {}
 
   EDInputSource::~EDInputSource() {
   }
@@ -44,7 +44,6 @@ namespace edm {
     desc.addUntracked<std::vector<std::string> >("fileNames", defaultStrings);
     desc.addUntracked<std::vector<std::string> >("secondaryFileNames", defaultStrings);
     desc.addUntracked<bool>("needSecondaryFileNames", false);
-    InputFileCatalog::fillDescription(desc);
     InputSource::fillDescription(desc);
   }
 }
