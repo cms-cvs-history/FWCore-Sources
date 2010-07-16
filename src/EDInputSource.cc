@@ -5,7 +5,6 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
-#include "FWCore/Utilities/interface/EDMException.h"
 
 namespace edm {
   
@@ -18,13 +17,11 @@ namespace edm {
       InputSource(pset, desc),
       catalog_(pset.getUntrackedParameter<std::vector<std::string> >("fileNames"),
         pset.getUntrackedParameter<std::string>("overrideCatalog", std::string())),
-      secondaryCatalog_(pset.getUntrackedParameter<std::vector<std::string> >("secondaryFileNames", std::vector<std::string>()),
-        pset.getUntrackedParameter<std::string>("overrideCatalog", std::string())) {
-
-     if (secondaryCatalog_.empty() && pset.getUntrackedParameter<bool>("needSecondaryFileNames", false)) {
-	throw Exception(errors::Configuration, "EDInputSource") << "'secondaryFileNames' must be specified\n";
-     }
-  }
+      secondaryCatalog_((pset.getUntrackedParameter<bool>("needSecondaryFileNames", false) ?
+	pset.getUntrackedParameter<std::vector<std::string> >("secondaryFileNames") : 
+	pset.getUntrackedParameter<std::vector<std::string> >("secondaryFileNames", std::vector<std::string>())),
+        pset.getUntrackedParameter<std::string>("overrideCatalog", std::string()))
+  {}
 
   EDInputSource::~EDInputSource() {
   }
@@ -47,7 +44,7 @@ namespace edm {
   EDInputSource::fillDescription(ParameterSetDescription & desc) {
     std::vector<std::string> defaultStrings;
     desc.addUntracked<std::vector<std::string> >("fileNames");
-    desc.addUntracked<std::vector<std::string> >("secondaryFileNames", defaultStrings);
+    desc.addOptionalUntracked<std::vector<std::string> >("secondaryFileNames", defaultStrings);
     desc.addUntracked<bool>("needSecondaryFileNames", false);
     desc.addUntracked<std::string>("overrideCatalog", std::string());
     InputSource::fillDescription(desc);
