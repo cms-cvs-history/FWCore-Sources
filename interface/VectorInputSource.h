@@ -35,9 +35,9 @@ namespace edm {
 
   private:
 
-    virtual std::auto_ptr<EventPrincipal> readOneRandom() = 0;
-    virtual std::auto_ptr<EventPrincipal> readOneSequential() = 0;
-    virtual std::auto_ptr<EventPrincipal> readOneSpecified(EventID const& event) = 0;
+    virtual EventPrincipal* readOneRandom() = 0;
+    virtual EventPrincipal* readOneSequential() = 0;
+    virtual EventPrincipal* readOneSpecified(EventID const& event) = 0;
 
     virtual void dropUnwantedBranches_(std::vector<std::string> const& wantedBranches) = 0;
   };
@@ -45,7 +45,7 @@ namespace edm {
   template<typename T>
   void VectorInputSource::loopRandom(int number, T& eventOperator) {
     for(int i = 0; i < number; ++i) {
-      std::auto_ptr<EventPrincipal> ep = readOneRandom();
+      EventPrincipal* ep = readOneRandom();
       eventOperator(*ep);
     }
   }
@@ -53,7 +53,7 @@ namespace edm {
   template<typename T>
   void VectorInputSource::loopSequential(int number, T& eventOperator) {
     for(int i = 0; i < number; ++i) {
-      std::auto_ptr<EventPrincipal> ep = readOneSequential();
+      EventPrincipal* ep = readOneSequential();
       eventOperator(*ep);
     }
   }
@@ -61,7 +61,7 @@ namespace edm {
   template<typename T>
   void VectorInputSource::loopSpecified(std::vector<EventID> const& events, T& eventOperator) {
     for(std::vector<EventID>::const_iterator it = events.begin(), itEnd = events.end(); it != itEnd; ++it) {
-      std::auto_ptr<EventPrincipal> ep = readOneSpecified(*it);
+      EventPrincipal* ep = readOneSpecified(*it);
       eventOperator(*ep);
     }
   }
