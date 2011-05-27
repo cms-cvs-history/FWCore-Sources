@@ -19,17 +19,15 @@ namespace edm {
   class ParameterSet;
   class VectorInputSource : public EDInputSource {
   public:
-    typedef boost::shared_ptr<EventPrincipal> EventPrincipalVectorElement;
-    typedef std::vector<EventPrincipalVectorElement> EventPrincipalVector;
     explicit VectorInputSource(ParameterSet const& pset, InputSourceDescription const& desc);
     virtual ~VectorInputSource();
 
     template<typename T>
-    size_t loopRandom(size_t number, T& eventOperator);
+    size_t loopRandom(size_t number, T eventOperator);
     template<typename T>
-    size_t loopSequential(size_t number, T& eventOperator);
-    template<typename T>
-    size_t loopSpecified(std::vector<EventID> const& events, T& eventOperator);
+    size_t loopSequential(size_t number, T eventOperator);
+    template<typename T, typename Collection>
+    size_t loopSpecified(Collection const& events, T eventOperator);
 
     void dropUnwantedBranches(std::vector<std::string> const& wantedBranches);
 
@@ -43,7 +41,7 @@ namespace edm {
   };
 
   template<typename T>
-  size_t VectorInputSource::loopRandom(size_t number, T& eventOperator) {
+  size_t VectorInputSource::loopRandom(size_t number, T eventOperator) {
     size_t i = 0U;
     for(; i < number; ++i) {
       EventPrincipal* ep = readOneRandom();
@@ -54,7 +52,7 @@ namespace edm {
   }
 
   template<typename T>
-  size_t VectorInputSource::loopSequential(size_t number, T& eventOperator) {
+  size_t VectorInputSource::loopSequential(size_t number, T eventOperator) {
     size_t i = 0U;
     for(; i < number; ++i) {
       EventPrincipal* ep = readOneSequential();
@@ -64,10 +62,10 @@ namespace edm {
     return i;
   }
 
-  template<typename T>
-  size_t VectorInputSource::loopSpecified(std::vector<EventID> const& events, T& eventOperator) {
+  template<typename T, typename Collection>
+  size_t VectorInputSource::loopSpecified(Collection const& events, T eventOperator) {
     size_t i = 0U;
-    for(std::vector<EventID>::const_iterator it = events.begin(), itEnd = events.end(); it != itEnd; ++it) {
+    for(typename Collection::const_iterator it = events.begin(), itEnd = events.end(); it != itEnd; ++it) {
       EventPrincipal* ep = readOneSpecified(*it);
       if(!ep) break;
       eventOperator(*ep);
