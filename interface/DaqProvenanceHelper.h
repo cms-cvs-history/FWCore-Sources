@@ -25,8 +25,8 @@ namespace edm {
       oldBranchID_ = oldBD.branchID();
       newBranchID_ = newBD.branchID();
     }
-    bool matchProcesses(ProcessConfiguration const& pc, ProcessHistory const& ph) const;
-    void fixMetaData(std::vector<ProcessConfiguration>& pcv, std::vector<ProcessHistory>& phv);
+    void fixMetaData(std::vector<ProcessConfiguration>& pcv);
+    void fixMetaData(std::vector<ProcessHistory>& phv);
     void fixMetaData(std::vector<BranchID>& branchIDs) const;
     void fixMetaData(BranchIDLists const&) const;
     void fixMetaData(BranchChildren& branchChildren) const;
@@ -42,6 +42,7 @@ namespace edm {
     BranchID oldBranchID_;
     BranchID newBranchID_;
     ProcessHistoryID const* oldProcessHistoryID_;
+    ProcessConfiguration processConfiguration_;
     ProcessHistoryIDMap phidMap_;
     ParentageIDMap parentageIDMap_;
   };
